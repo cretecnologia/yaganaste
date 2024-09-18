@@ -5,29 +5,7 @@ Description: Proporciona servicios POST y GET para manejar cédulas y otros dato
 Version: 1.0
 Author: Christian Cortés
 */
-/*
-add_action('rest_api_init', function () {
-    // Ruta para el servicio GET
-    
-     error_log('Registro de rutas en la API'); 
-     ob_start();
-    var_dump('Registro de rutas en la API');
-    $output = ob_get_clean();
-    file_put_contents(plugin_dir_path(__FILE__) . 'debug.log', $output, FILE_APPEND);
-     
-    register_rest_route('pruebaapi/v1', '/obtener-datos/', [
-        'methods' => 'GET',
-        'callback' => 'pruebaapi_obtener_datos',
-        'permission_callback' => '__return_true',
-    ]);
-    
-    // Ruta para el servicio POST
-    register_rest_route('pruebaapi/v1', '/enviar-datos/', [
-        'methods' => 'POST',
-        'callback' => 'pruebaapi_enviar_datos',
-        'permission_callback' => '__return_true',
-    ]);
-});*/
+
 
 add_action('rest_api_init', function () {
     // Ruta para el servicio GET
@@ -88,103 +66,6 @@ function pruebaapi_obtener_datos(WP_REST_Request $request) {
         ], 404);
     }
 }
-
-/*
-
-function pruebaapi_enviar_datos(WP_REST_Request $request) {
-    // Obtener los datos enviados en el POST
-    $cedula = sanitize_text_field($request->get_param('cedula'));
-    $telefono = sanitize_text_field($request->get_param('telefono'));
-    $provincia = sanitize_text_field($request->get_param('provincia'));
-    $monto = floatval($request->get_param('monto')); // Convertir a decimal
-
-    // Validar que los campos obligatorios no estén vacíos
-    if (empty($cedula) || empty($telefono) || empty($provincia) || $monto === null) {
-        return new WP_REST_Response(['message' => 'Faltan parámetros'], 400);
-    }
-
-    global $wpdb;
-    $tabla = $wpdb->prefix . 'donaciones_yaganaste_api';
-
-    // Primero, insertamos los datos sin el código único
-    $resultado = $wpdb->insert(
-        $tabla,
-        [
-            'cedula' => $cedula,
-            'telefono' => $telefono,
-            'provincia' => $provincia,
-            'monto' => $monto
-        ],
-        [
-            '%s', // Tipo de dato para cedula
-            '%s', // Tipo de dato para telefono
-            '%s', // Tipo de dato para provincia
-            '%f'  // Tipo de dato para monto
-        ]
-    );
-
-    // Verificamos si la inserción fue exitosa
-    if ($resultado !== false) {
-        // Obtenemos el ID generado
-        $id_generado = $wpdb->insert_id;
-
-        // Calculamos el código único incluyendo el ID generado
-        $codigo_unico = md5($id_generado . $cedula . $telefono . $provincia . $monto);
-
-        // Actualizamos la fila con el código único generado
-        $wpdb->update(
-            $tabla,
-            ['codigo_unico' => substr($codigo_unico, 0, 8)], // Tomamos los primeros 8 caracteres
-            ['id' => $id_generado], // Condición para actualizar solo la fila recién insertada
-            ['%s'], // Tipo de dato para codigo_unico
-            ['%d']  // Tipo de dato para id
-        );
-
-        return new WP_REST_Response([
-            'message' => 'Datos guardados correctamente',
-            'codigo_unico' => substr($codigo_unico, 0, 8) // Retornar el código único generado
-        ], 200);
-    } else {
-        return new WP_REST_Response(['message' => 'Error al guardar los datos'], 500);
-    }
-}
-*/
-/*
-function pruebaapi_enviar_datos(WP_REST_Request $request) {
-    // Valida el token POS recibido en el cuerpo del POST
-    $token_pos = sanitize_text_field($request->get_param('api_post_token'));
-    $token_pos_correcto = 'd9e2-5953-c3a6-4f08-b869'; // El token POS esperado
-
-    if ($token_pos !== $token_pos_correcto) {
-        return new WP_REST_Response(['message' => 'Token POS no válido'], 403);
-    }
-
-    // Continuar con el resto del procesamiento de datos
-    $cedula = sanitize_text_field($request->get_param('cedula'));
-    $telefono = sanitize_text_field($request->get_param('telefono'));
-    $provincia = sanitize_text_field($request->get_param('provincia'));
-    $monto = sanitize_text_field($request->get_param('monto'));
-
-    global $wpdb;
-    $tabla = $wpdb->prefix . 'donaciones_yaganaste_api';
-
-    // Insertar datos en la tabla
-    $resultado = $wpdb->insert($tabla, [
-        'cedula' => $cedula,
-        'telefono' => $telefono,
-        'provincia' => $provincia,
-        'monto' => $monto,
-        'codigo_unico' => calcular_codigo_unico($cedula, $telefono, $provincia, $monto),
-    ], ['%s', '%s', '%s', '%f', '%s']);
-
-    if ($resultado) {
-        return new WP_REST_Response(['message' => 'Datos guardados correctamente'], 200);
-    } else {
-        return new WP_REST_Response(['message' => 'Error al guardar los datos'], 500);
-    }
-}
-
-*/
 
 
 function pruebaapi_enviar_datos(WP_REST_Request $request) {
